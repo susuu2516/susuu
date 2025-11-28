@@ -1,0 +1,23 @@
+public class Thoroughbred {
+    private Thoroughbred mother;
+    private Thoroughbred father;
+    private int birthYear;
+
+    public Thoroughbred(Thoroughbred mother, Thoroughbred father, int birthYear) {
+        this.mother = mother;
+        this.father = father;
+        this.birthYear = birthYear;
+    }
+
+    public int getCurrentAge() {
+        return java.time.Year.now().getValue() - birthYear;
+    }
+
+    public Thoroughbred getFather() {
+        return father;
+    }
+
+    public Thoroughbred getMother() {
+        return mother;
+    }
+}
