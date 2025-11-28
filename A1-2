@@ -1,0 +1,69 @@
+public class College {
+    private String name;
+
+    // 【组合】建筑是学院的一部分，学院销毁时建筑也销毁
+    private List<Building> buildings = new ArrayList<>();
+
+    // 【聚合】课程由学院提供，但课程可以在其他学院也存在
+    private List<Course> courses = new ArrayList<>();
+
+    // 添加建筑（组合关系）
+    public void addBuilding(Building building) {
+        buildings.add(building);
+    }
+
+    // 添加课程（聚合关系）
+    public void addCourse(Course course) {
+        courses.add(course);
+    }
+
+    public List<Building> getBuildings() { return buildings; }
+    public List<Course> getCourses() { return courses; }
+}
+
+public class Building {
+    private String code;      // 例如：J1、J2
+    private String name;      // 教学楼名称
+    private String address;
+
+    // 反向导航（可选，用于查询该建筑中开设的课程）
+    private List<Course> coursesHeldIn = new ArrayList<>();
+
+    public void addCourse(Course course) {
+        coursesHeldIn.add(course);
+    }
+
+    // getter & setter
+    public String getCode() { return code; }
+    public void setCode(String code) { this.code = code; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+
+public class Course {
+    private String code;      // 课程编号
+    private String title;     // 课程名称
+    private int credits;
+
+    // 课程必须在某个建筑中进行（约束在类图中用 { } 注释表示）
+    private Building location;   // 必须有值，不能为 null
+
+    public Course(String code, String title, int credits, Building location) {
+        this.code = code;
+        this.title = title;
+        this.credits = credits;
+        this.setLocation(location);  // 强制设置地点
+    }
+
+    public void setLocation(Building location) {
+        if (location == null) {
+            throw new IllegalArgumentException("Course must be held in some Building!");
+        }
+        this.location = location;
+        location.addCourse(this);    // 双向维护
+    }
+
+    public Building getLocation() { return location; }
+    public String getCode() { return code; }
+    public String getTitle() { return title; }
+}
