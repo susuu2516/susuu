@@ -1,0 +1,48 @@
+public class School {
+    private String name;
+    private List<Department> departments = new ArrayList<>();
+    private List<Student> students = new ArrayList<>();
+
+    // 关联操作略，可自行添加 addDepartment / addStudent 等
+}
+
+public class Department {
+    private String name;
+    private List<Instructor> instructors = new ArrayList<>();
+    private List<Subject> subjects = new ArrayList<>();
+
+    // 1..* 指导教师、1..* 课程
+}
+
+public class Instructor {
+    private String name;
+    private Department department;           // 至少属于一个系
+    private List<Subject> teachingSubjects = new ArrayList<>(); // 1~3门
+
+    public void addSubject(Subject s) {
+        if (teachingSubjects.size() >= 3) throw new RuntimeException("最多教授3门课");
+        teachingSubjects.add(s);
+    }
+}
+
+public class Subject {
+    private String code;
+    private String title;
+    private List<Student> enrolledStudents = new ArrayList<>(); // 参加学习的学生
+    private List<Instructor> instructors = new ArrayList<>();   // 教授的教师
+}
+
+public class Student {
+    private String id;
+    private String name;
+    private List<Subject> enrolledSubjects = new ArrayList<>(); // 1~5门
+
+    public void enroll(Subject s) {
+        if (enrolledSubjects.size() >= 5) throw new RuntimeException("最多选5门课");
+        enrolledSubjects.add(s);
+        s.getEnrolledStudents().add(this);
+    }
+
+    // getter
+    public List<Subject> getEnrolledSubjects() { return enrolledSubjects; }
+}
