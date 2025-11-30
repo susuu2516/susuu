@@ -1,6 +1,3 @@
-// src/main/java/com/lab4/b1/WaterHeater.java
-package com.lab4.b1;
-
 import java.time.LocalTime;
 import java.util.Timer;
 import java.util.TimerTask;
