@@ -1,0 +1,68 @@
+public class ControlPanel {
+    private enum State { IDLE, READING_PASSWORD, COMPARING, SELECTING, LOCKED }
+    private State state = State.IDLE;
+    private String input = "";
+    private int errorCount = 0;
+    private final String CORRECT_PASSWORD = "1234";
+
+    public void pressKey(char c) {
+        if (state == State.LOCKED) {
+            System.out.println("面板已锁定，请等待解锁...");
+            return;
+        }
+
+        if (state == State.IDLE) {
+            state = State.READING_PASSWORD;
+            input = "";
+            errorCount = 0;
+        }
+
+        if (state == State.READING_PASSWORD) {
+            input += c;
+            System.out.println("已输入: " + "*".repeat(input.length()));
+
+            if (input.length() == 4) {
+                state = State.COMPARING;
+                validatePassword();
+            }
+        }
+    }
+
+    private void validatePassword() {
+        System.out.println("Do: validatePassword()");
+        if (input.equals(CORRECT_PASSWORD)) {
+            state = State.SELECTING;
+            System.out.println("密码正确！进入系统功能选择");
+        } else {
+            errorCount++;
+            System.out.println("密码错误！第 " + errorCount + " 次");
+            if (errorCount >= 3) {
+                state = State.LOCKED;
+                System.out.println("错误超过3次，面板锁定120秒！");
+                ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
+                exec.schedule(() -> {
+                    state = State.IDLE;
+                    System.out.println("120秒已到，面板已解锁");
+                }, 120, TimeUnit.SECONDS);
+            } else {
+                state = State.READING_PASSWORD;
+                input = "";
+            }
+        }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        ControlPanel panel = new ControlPanel();
+        // 模拟连续输错3次
+        panel.pressKey('9'); panel.pressKey('9');
+        panel.pressKey('9'); panel.pressKey('9');
+        panel.pressKey('8'); panel.pressKey('8');
+        panel.pressKey('8'); panel.pressKey('8');
+        panel.pressKey('7'); panel.pressKey('7');
+        panel.pressKey('7'); panel.pressKey('7'); // 第3次错 → 锁定
+        Thread.sleep(5000);
+        // 正确输入
+        panel.pressKey('1'); panel.pressKey('2');
+        panel.pressKey('3'); panel.pressKey('4');
+    }
+}
