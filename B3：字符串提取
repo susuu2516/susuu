@@ -1,0 +1,45 @@
+import java.util.ArrayList;
+import java.util.List;
+
+public class StringExtractor {
+
+    public static List<String> extractStrings(String source) {
+        List<String> result = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inString = false;
+        boolean escaped = false;
+
+        for (int i = 0; i < source.length(); i++) {
+            char c = source.charAt(i);
+
+            if (!inString) {
+                if (c == '"') {
+                    inString = true;
+                    current = new StringBuilder();
+                }
+            } else {
+                if (escaped) {
+                    current.append(c);
+                    escaped = false;
+                } else if (c == '\\') {
+                    escaped = true;
+                } else if (c == '"') {
+                    result.add(current.toString());
+                    inString = false;
+                } else {
+                    current.append(c);
+                }
+            }
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        String code = """
+            System.out.println("他说：\\"Hello World!\\"");
+            String s = "C:\\\\Program Files\\\\Java";
+            String multi = "第一段""连续""三个字符串";
+            """;
+
+        List<String> strings = extractStrings(code);
+        strings.forEach(s -> System.out.println("提取到: " + s));
