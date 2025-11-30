@@ -1,3 +1,13 @@
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * A1-2 学院 - 建筑 - 课程 模型
+ * 
+ * College «-◆ Building      → 组合（College 拥有 Building，Building 随 College 销毁）
+ * College ○-◆ Course        → 聚合（Course 由 College 持有，但 Course 可以独立存在）
+ * Course {Course must be held in some Building}  → 约束注释
+ */
 public class College {
     private String name;
 
