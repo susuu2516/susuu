@@ -1,0 +1,59 @@
+// src/main/java/com/lab4/b1/WaterHeater.java
+package com.lab4.b1;
+
+import java.time.LocalTime;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class WaterHeater {
+    private enum State { SLEEPING, IDLE, CHECKING_WATER, HEATING, BOILED, BROKEN }
+    private State currentState = State.SLEEPING;
+    private double temperature = 15.0;
+    private boolean hasWater = true;
+
+    public WaterHeater() {
+        scheduleDailyTasks();
+        new Thread(this::simulateTemperature).start();
+    }
+
+    private void scheduleDailyTasks() {
+        Timer timer = new Timer(true);
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override public void run() {
+                if (LocalTime.now().getHour() == 23) {
+                    currentState = State.SLEEPING;
+                    System.out.println("[23:00] 进入休眠状态");
+                } else if (LocalTime.now().getHour() == 7 && LocalTime.now().getMinute() == 0) {
+                    currentState = State.IDLE;
+                    System.out.println("[07:00] 唤醒进入待机");
+                }
+            }
+        }, 0, 60_000); // 每分钟检查一次
+    }
+
+    private void simulateTemperature() {
+        while (true) {
+            try { Thread.sleep(3000); } catch (Exception e) {}
+            if (currentState == State.HEATING) {
+                temperature += 10;
+                System.out.println("加热中... 当前温度: " + temperature + "℃");
+                if (temperature >= 100) {
+                    currentState = State.BOILED;
+                    System.out.println("已达100℃，断开电源");
+                    temperature = 95;
+                    currentState = State.IDLE;
+                }
+            }
+
+            if (currentState == State.IDLE && temperature < 20 && hasWater) {
+                currentState = State.HEATING;
+                System.out.println("温度低于20℃且有水，开始加热");
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        new WaterHeater();
+        System.out.println("恒温水箱已启动...");
+    }
+}
